@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Timetable</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 20px auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 2.5em;
+            color: #4A148C;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        select, input[type="text"], input[type="submit"] {
+            width: calc(100% - 22px);
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+            font-size: 1em;
+            color: #555;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: #4A148C;
+            outline: none;
+        }
+
+        input[type="submit"] {
+            background-color: #6A1B9A;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #4A148C;
+            transform: translateY(-2px);
+        }
+
+        input[type="submit"]:active {
+            background-color: #3f0d73;
+            transform: translateY(0);
+        }
+
+        .alert {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Timetable</h1>
+        {% if success_message %}
+        <div class="alert">{{ success_message }}</div>
+        {% endif %}
+        <form method="POST" action="/">
+            <label for="studentID">Student ID:</label>
+            <input type="text" id="studentID" name="studentID" required>
+
+            <label for="day">Day of the week:</label>
+            <input type="text" id="day" name="day" required>
+
+            <label for="numbers">Number of subjects:</label>
+            <input type="text" id="numbers" name="numbers" required>
+
+            <div id="subjectInputs">
+                <!-- Subject inputs will be dynamically added here using JavaScript -->
+            </div>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <script>
+        // Step 1: Get references to the number of subjects input field, the subject inputs container, and the form element
+        const numbersInput = document.getElementById('numbers');
+        const subjectInputs = document.getElementById('subjectInputs');
+        const form = document.querySelector('form');
+
+        // Step 2: Add an event listener to the number of subjects input field to dynamically generate subject selection fields based on the user's input
+        numbersInput.addEventListener('input', (e) => {
+            const number = parseInt(e.target.value); // Convert the input value to an integer representing the number of subjects
+            subjectInputs.innerHTML = ''; // Clear any existing subject input fields
+
+            // Step 3: Loop through the number of subjects to create corresponding dropdown menus
+            for (let i = 0; i < number; i++) {
+                // Step 3.1: Create a new <select> element for selecting a subject
+                const subjectSelect = document.createElement('select');
+                subjectSelect.name = `subject${i}`; // Set the name attribute to uniquely identify each subject
+
+                // Step 3.2: Create a default <option> element prompting the user to choose a subject
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.text = 'Choose a subject';
+                subjectSelect.appendChild(defaultOption); // Add the default option to the <select> element
+
+                // Step 3.3: Define the list of subjects to populate the dropdown
+                const subjects = ['Physics', 'Chemistry', 'Maths', 'Biology', 'Social studies', 'English', 'Drawing', 'Sanskrit'];
+                
+                // Step 3.4: Loop through each subject and create an <option> element for it
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject; // Set the value of the option to the subject's name
+                    option.text = subject; // Set the display text of the option to the subject's name
+                    subjectSelect.appendChild(option); // Add the option to the <select> element
+                });
+
+                // Step 3.5: Append the newly created <select> element to the subjectInputs container
+                subjectInputs.appendChild(subjectSelect);
+                subjectInputs.appendChild(document.createElement('br')); // Add a line break after each <select> element for better formatting
+            }
+        });
+
+        // Step 4: Add an event listener to the form's submit event to validate that all subject fields have been selected before allowing submission
+        form.addEventListener('submit', (e) => {
+            const selects = document.querySelectorAll('select'); // Get all <select> elements in the form
+            for (const select of selects) {
+                if (select.value === '') { // Check if any <select> element has not been filled out
+                    e.preventDefault(); // Prevent the form from submitting if any subject is not selected
+                    alert('Please choose a subject for all fields.'); // Show an alert to the user prompting them to select all subjects
+                    return; // Exit the loop and the event handler since the form should not be submitted
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
